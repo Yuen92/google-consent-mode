@@ -1,25 +1,12 @@
-/**
-@license
-Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
-*/
-
 import { LitElement, html, css } from 'lit';
-import { setPassiveTouchGestures } from '@polymer/polymer/lib/utils/settings.js';
 import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
 import { installOfflineWatcher } from 'pwa-helpers/network.js';
 import { installRouter } from 'pwa-helpers/router.js';
 import { updateMetadata } from 'pwa-helpers/metadata.js';
 
 // These are the elements needed by this element.
-import '@polymer/app-layout/app-drawer/app-drawer.js';
-import '@polymer/app-layout/app-header/app-header.js';
-import '@polymer/app-layout/app-scroll-effects/effects/waterfall.js';
-import '@polymer/app-layout/app-toolbar/app-toolbar.js';
+import '@material/mwc-drawer';
+import '@material/mwc-top-app-bar';
 import { menuIcon } from './my-icons.js';
 import './snack-bar.js';
 
@@ -52,10 +39,13 @@ class MyApp extends LitElement {
           --app-header-background-color: white;
           --app-header-text-color: var(--app-dark-text-color);
           --app-header-selected-color: var(--app-primary-color);
+          --mdc-theme-primary: var(--app-header-background-color);
+          --mdc-theme-on-primary: var(--app-header-text-color);
 
           --app-drawer-background-color: var(--app-secondary-color);
           --app-drawer-text-color: var(--app-light-text-color);
           --app-drawer-selected-color: #78909C;
+          --mdc-theme-surface: var(--app-drawer-background-color);
         }
 
         app-header {
@@ -71,16 +61,11 @@ class MyApp extends LitElement {
 
         .toolbar-top {
           background-color: var(--app-header-background-color);
+          text-align: center;
         }
 
         [main-title] {
-          font-family: 'Pacifico';
-          text-transform: lowercase;
           font-size: 30px;
-          /* In the narrow layout, the toolbar is offset by the width of the
-          drawer button, and the text looks not centered. Add a padding to
-          match that button */
-          padding-right: 44px;
         }
 
         .toolbar-list {
@@ -136,7 +121,6 @@ class MyApp extends LitElement {
         }
 
         .main-content {
-          padding-top: 64px;
           min-height: 100vh;
         }
 
@@ -166,10 +150,6 @@ class MyApp extends LitElement {
             display: none;
           }
 
-          .main-content {
-            padding-top: 107px;
-          }
-
           /* The drawer button isn't shown in the wide layout, so we don't
           need to offset the title */
           [main-title] {
@@ -183,56 +163,53 @@ class MyApp extends LitElement {
   render() {
     // Anything that's related to rendering should be done in here.
     return html`
-      <!-- Header -->
-      <app-header condenses reveals effects="waterfall">
-        <app-toolbar class="toolbar-top">
-          <button class="menu-btn" title="Menu" @click="${this._menuButtonClicked}">${menuIcon}</button>
-          <div main-title>${this.appTitle}</div>
-        </app-toolbar>
-
-        <!-- This gets hidden on a small screen-->
-        <nav class="toolbar-list">
-          <a ?selected="${this._page === 'view1'}" href="/view1">View One</a>
-          <a ?selected="${this._page === 'view2'}" href="/view2">View Two</a>
-          <a ?selected="${this._page === 'view3'}" href="/view3">View Three</a>
-        </nav>
-      </app-header>
-
-      <!-- Drawer content -->
-      <app-drawer
-          .opened="${this._drawerOpened}"
-          @opened-changed="${this._drawerOpenedChanged}">
+      <mwc-drawer type="modal"
+        .open="${this._drawerOpened}"
+        @MDCDrawer:closed="${ this._drawerOpenedChanged }">
+        <!-- Drawer content -->
         <nav class="drawer-list">
           <a ?selected="${this._page === 'view1'}" href="/view1">View One</a>
           <a ?selected="${this._page === 'view2'}" href="/view2">View Two</a>
           <a ?selected="${this._page === 'view3'}" href="/view3">View Three</a>
         </nav>
-      </app-drawer>
 
-      <!-- Main content -->
-      <main role="main" class="main-content">
-        <my-view1 class="page" ?active="${this._page === 'view1'}"></my-view1>
-        <my-view2 class="page" ?active="${this._page === 'view2'}"></my-view2>
-        <my-view3 class="page" ?active="${this._page === 'view3'}"></my-view3>
-        <my-view404 class="page" ?active="${this._page === 'view404'}"></my-view404>
-      </main>
+        <div slot="appContent">
+          <!-- Header -->
+          <mwc-top-app-bar class="toolbar-top" centerTitle>
+            <button class="menu-btn" title="Menu" @click="${this._menuButtonClicked}" slot="navigationIcon">${menuIcon}</button>
+            <div main-title slot="title">${this.appTitle}</div>
 
-      <footer>
-        <p>Made with &hearts; by the Polymer team.</p>
-      </footer>
+            <!-- This gets hidden on a small screen-->
+            <nav class="toolbar-list">
+              <a ?selected="${this._page === 'view1'}" href="/view1">View One</a>
+              <a ?selected="${this._page === 'view2'}" href="/view2">View Two</a>
+              <a ?selected="${this._page === 'view3'}" href="/view3">View Three</a>
+            </nav>
+          </mwc-top-app-bar>
 
-      <snack-bar ?active="${this._snackbarOpened}">
-        You are now ${this._offline ? 'offline' : 'online'}.
-      </snack-bar>
+          <!-- Main content -->
+          <main role="main" class="main-content">
+            <my-view1 class="page" ?active="${this._page === 'view1'}"></my-view1>
+            <my-view2 class="page" ?active="${this._page === 'view2'}"></my-view2>
+            <my-view3 class="page" ?active="${this._page === 'view3'}"></my-view3>
+            <my-view404 class="page" ?active="${this._page === 'view404'}"></my-view404>
+          </main>
+
+          <footer>
+            <p>Made with &hearts;.</p>
+          </footer>
+
+          <snack-bar ?active="${this._snackbarOpened}">
+            You are now ${this._offline ? 'offline' : 'online'}.
+          </snack-bar>
+        </div>
+      </mwc-drawer>
     `;
   }
 
   constructor() {
     super();
     this._drawerOpened = false;
-    // To force all event listeners for gestures to be passive.
-    // See https://www.polymer-project.org/3.0/docs/devguide/settings#setting-passive-touch-gestures
-    setPassiveTouchGestures(true);
   }
 
   firstUpdated() {
