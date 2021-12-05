@@ -20,7 +20,9 @@
     "test:regenerate_screenshots": "mocha test/integration/screenshots-baseline/regenerate.js --timeout=15000"
   },
   "dependencies": {
+    "@material/mwc-button": "^0.25.3",
     "@material/mwc-drawer": "^0.25.3",
+    "@material/mwc-list": "^0.25.3",
     "@material/mwc-top-app-bar": "^0.25.3",
     "@webcomponents/webcomponentsjs": "^2.2.4",
     "lit": "^2.0.2",
